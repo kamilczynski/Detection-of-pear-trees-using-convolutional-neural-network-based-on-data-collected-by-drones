@@ -7,7 +7,7 @@ import os
 mpl.rcParams['font.size'] = 10
 
 # Define individual font sizes
-title_fontsize = 30   # używane dla tytułu wykresu
+title_fontsize = 30   # used for the chart title
 axis_labelsize = 30   # font size for axis labels (e.g., "Epoch")
 ticks_labelsize = 30  # font size for axis tick labels
 legend_fontsize = 22  # font size for legend text
@@ -24,11 +24,11 @@ os.makedirs(save_dir, exist_ok=True)
 df_ipt = pd.read_csv(r"C:\Users\topgu\Desktop\Art\POSTER 2025\resultsold.csv")
 df_rot = pd.read_csv(r"C:\Users\topgu\Desktop\Art\POSTER 2025\resultsnew.csv")
 
-# Zakładamy, że kolumna 'epoch' jest taka sama dla obu modeli
+# We assume that the 'epoch' column is the same for both models
 epochs_ipt = df_ipt['epoch']
 epochs_rot = df_rot['epoch']
 
-# Wyodrębniamy interesujące nas metryki
+# We extract the metrics that interest us
 metrics = {
     "val/box_loss": {
         "Single tree": df_ipt['val/box_loss'],
@@ -44,40 +44,40 @@ metrics = {
     }
 }
 
-# (Opcjonalny) słownik z kolorami tytułów metryk
+# (Optional) dictionary with colors for metric titles
 metric_title_colors = {
     "val/box_loss": "white",
     "val/cls_loss": "white",
     "val/dfl_loss": "white"
 }
 
-# Dla każdej metryki tworzymy osobny wykres
+# We create a separate chart for each metric
 for metric, data in metrics.items():
     fig = plt.figure(figsize=(8, 6))
-    fig.patch.set_facecolor(bg_color)  # kolor tła figury
+    fig.patch.set_facecolor(bg_color)  # figure background color
 
     ax = fig.gca()
-    ax.set_facecolor(bg_color)  # kolor tła wykresu
+    ax.set_facecolor(bg_color)  # chart background color
 
-    # Rysowanie serii "Single tree" (IPT)
+    # Drawing "Single tree" series (IPT)
     ax.plot(epochs_ipt, data["Single tree"], color='lime', marker='o', label='Single tree')
-    # Rysowanie serii "Row of trees" (ROT)
+    # Drawing series "Row of trees" (ROT)
     ax.plot(epochs_rot, data["Row of trees"], color='yellow', marker='o', label='Row of trees')
 
-    # >>> AUTOMATYCZNE DODANIE TYTUŁU WYKRESU NA PODSTAWIE NAZWY METRYKI <<<
-    #ax.set_title(metric, fontsize=title_fontsize, color=metric_title_colors.get(metric, "white"))
+    # >>> AUTOMATICALLY ADDING A CHART TITLE BASED ON THE METRIC NAME <<<
+    ax.set_title(metric, fontsize=title_fontsize, color=metric_title_colors.get(metric, "white"))
 
-    # Ustawienie etykiet osi z kolorem białym
+    # Set axis labels to white
     ax.set_xlabel("Epoch", fontsize=axis_labelsize, color="white")
     ax.set_ylabel("", fontsize=axis_labelsize, color="white")  # Brak etykiety dla osi Y
 
-    # Automatyczne dopasowanie zakresu osi
+    # Automatic adjustment of the axis range
     ax.autoscale()
 
-    # Dodanie niewielkich marginesów horyzontalnych
+    # Adding small horizontal margins
     ax.margins(x=0.01)
 
-    # Dodanie legendy (z półprzezroczystym tłem)
+    # Adding a legend (with semi-transparent background)
     legend = ax.legend(
         loc='best',
         fontsize=legend_fontsize,
@@ -85,16 +85,16 @@ for metric, data in metrics.items():
         edgecolor='white',
         framealpha=0.6
     )
-    # Ustawienie koloru tekstu legendy na biały
+    # Set legend text color to white
     for text in legend.get_texts():
         text.set_color("white")
 
     plt.tight_layout()
 
-    # Generowanie nazwy pliku na podstawie nazwy metryki (bez znaków specjalnych)
+    # Generating file name based on metric name (no special characters)
     filename = metric.replace("(", "").replace(")", "").replace("/", "_") + ".png"
     file_path = os.path.join(save_dir, filename)
 
-    # Zapisanie wykresu do pliku z tą samą barwą tła, co figura
+    # Saving the graph to a file with the same background color as the figure
     plt.savefig(file_path, dpi=300, facecolor=fig.get_facecolor())
     plt.close(fig)
